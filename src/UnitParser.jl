@@ -75,7 +75,7 @@ end
 
 Reduce the natural name of a units to its symbolic form for prefix and name.
 
-If not match is found, return the original string.
+If no match is found, return the original string.
 
 Example
 =======
@@ -84,11 +84,11 @@ julia> reduce_units("micrometers")
 
 Return
 ======
-units_prefix: String
+unit_prefix: String
     Short form representing the prefix of the units, e.g. "k" for "kilo".
     Set to empty string if the units had no prefix.
 
-core_units: String
+core_unit: String
     Short form representing the units, e.g. "A" for "ampere".
 """
 function reduce_units(units_name::AbstractString)
@@ -99,27 +99,27 @@ function reduce_units(units_name::AbstractString)
         units_name = units_name[1:end-1]
     end
 
-    units_prefix = ""
+    unit_prefix = ""
 
     for (prefix, symbol) in prefixes
         n = length(prefix)
         if length(units_name) >= n && units_name[1:n] == prefix
-            units_prefix = symbol
+            unit_prefix = symbol
             units_name = units_name[n+1:end]
             break
         end
     end
 
-    core_units = units_name
+    core_unit = units_name
 
     for (alias, symbol) in aliases
         if units_name == alias
-            core_units = symbol
+            core_unit = symbol
             break
         end
     end
 
-    return units_prefix, core_units
+    return unit_prefix, core_unit
 end
 
 end # module
