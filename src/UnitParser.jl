@@ -1,6 +1,6 @@
 module UnitParser
 
-export parse_units
+export destructure_units, reduce_units_expr
 
 using YAML
 
@@ -25,16 +25,30 @@ consume(string, ::Nothing) = string
 match_start(pattern, string) = match(r"^" * pattern, string)
 
 
-"""
-    parse_units(string)
+function reduce_units_expr(string::AbstractString)
+    factors = []
+    for (prefix, core, exponent) in destructure_units(string)
+        if exponent != 1
+            factor = "$prefix$core^$exponent"
+        else
+            factor = "$prefix$core"
+        end
+        push!(factors, factor)
+    end
+    return join(factors, "*")
+end
 
-Parse a string representing units and parse it into a list of individual
-units represented as a tuple (prefix, name, exponent).
+
 """
-function parse_units(string)
-    string, factors = parse_factors(string)
+    destructure_units(string)
+
+Deconstruct a string representing units into a list of (prefix, name, exponent),
+one for each factor.
+"""
+function destructure_units(string::AbstractString)
+    string, factors = destructure_factors(string)
     string = consume(string, match_start(r_divide, string))
-    string, divisors = parse_factors(string)
+    string, divisors = destructure_factors(string)
 
     if length(string) > 0
         @error "The input string could not be fully parsed"
@@ -49,11 +63,11 @@ function parse_units(string)
 end
 
 
-function parse_factors(string)
+function destructure_factors(string::AbstractString)
     factors = []
-    while (m = match_start(r_unit_name, string)) !== nothing
+    while (match_start(r_divide, string) === nothing &&
+          (m = match_start(r_unit_name, string)) !== nothing)
         unit_name = m.match
-        match_start(r_divide, unit_name) !== nothing && break
         string = consume(string, m)
 
         if (m = match_start(r_power * r_integer, string)) !== nothing
@@ -63,7 +77,7 @@ function parse_factors(string)
             exponent = 1
         end
 
-        push!(factors, (reduce_units(unit_name)..., exponent))
+        push!(factors, (short_form(unit_name)..., exponent))
 
         string = consume(string, match_start(r_multiply, string))
     end
@@ -73,7 +87,7 @@ end
 
 
 """
-    reduce_units(units_name::AstractString)
+    short_form(units_name::AstractString)
 
 Reduce the natural name of a units to its symbolic form for prefix and name.
 
@@ -81,7 +95,7 @@ If no match is found, return the original string.
 
 Example
 =======
-julia> reduce_units("micrometers")
+julia> short_form("micrometers")
 ("μ", "m")
 
 Return
@@ -93,7 +107,7 @@ unit_prefix: String
 core_unit: String
     Short form representing the units, e.g. "A" for "ampere".
 """
-function reduce_units(units_name::AbstractString)
+function short_form(units_name::AbstractString)
     units_name = lowercase(units_name)
 
     # Remove trailing 's' to account for pluralized units
