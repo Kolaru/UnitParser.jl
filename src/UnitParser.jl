@@ -1,65 +1,74 @@
 module UnitParser
 
-using StringParserPEG
+export parse_units
+
 using YAML
 
+const aliases_data = YAML.load(open("src/aliases.yaml"))
+const prefixes = aliases_data["prefixes"]
+const aliases = aliases_data["units"]
 
-units_grammar = Grammar("""
-    start => (product & divisor {liftchild}) {(r,v,f,l,c) -> [c[1]..., c[2]...]} | product {liftchild}
-    divisor => (-(divide) & product) {(r,v,f,l,c) -> [(cc[1], -cc[2]) for cc in c[1]]}
-    divide => *(space) & divide_op & *(space)
-    divide_op => '/' | 'per' | 'PER'
-    product => (unit & +(factor)) {(r,v,f,l,c) -> [c[1], c[2].children...]} | unit {(r,v,f,l,c) -> c}
-    factor => (-(multiply) & !(divide) & unit {liftchild}) {liftchild}
-    multiply => *(space) & multiply_op & *(space) | +(space)
-    multiply_op => '.' | '*' | '-'
-    unit => (name & power) {(r,v,f,l,c) -> (c[1], c[2])} | name {(r,v,f,l,c) -> (c[1], 1)}
-    power => (-(?(raise)) & int) {(r,v,f,l,c) -> parse(Int, c[1].value)}
-    raise => '^' | '**'
-    name => (r([A-Za-zμ]+)r) {(r,v,f,l,c) -> v}
-    space => ' '
-    int => r(-?[0-9]+)r
-""")
+const r_integer = r"(-?[0-9]+)"
+const r_unit_name = r"([A-Za-zμ]+)"
+const r_power = r" *(?:\*\*|\^)? *"
+const r_divide = r" *(?:/|per|PER) *"
+const r_multiply = r" *[\*\. ] *"
 
-aliases_data = YAML.load(open("aliases.yaml"))
-prefixes = aliases_data["prefixes"]
-aliases = aliases_data["units"]
+"""
+    consume(string, m::RegexMatch)
 
-to_unitful(units_string) = join_symbols(to_symbols(units_string))
+Remove the matching part of the RegexMatch and return the shorter string.
+"""
+consume(string, m::RegexMatch) = string[length(m.match)+1:end]
+consume(string, ::Nothing) = string
 
 
 """
-    join_symbols(symbol_tuples::Vector{Tuple})
+    parse_units(string)
+
+Parse a string representing units and parse it into a list of individual
+units represented as a tuple (prefix, name, exponent).
 """
-function join_symbols(symbol_tuples)
-    units = map(symbol_tuples) do tuple
-        if tuple[2] == 1
-            return tuple[1]
-        else
-            return join([tuple[1], "^", tuple[2]])
-        end
+function parse_units(string)
+    string, factors = parse_factors(string)
+    string = consume(string, match(r"^" * r_divide, string))
+    string, divisors = parse_factors(string)
+
+    if length(string) > 0
+        @error "The input string could not be fully parsed"
     end
 
-    return join(units, "*")
-end
-
-"""
-    to_symbols(units_string::AbstractString)
-"""
-function to_symbols(units_string::AbstractString)
-    raw_units, _, err = parse(units_grammar, units_string)
-    new_units = []
-
-    for units in raw_units
-        if isa(units, Tuple)
-            push!(new_units, (reduce_units(units[1]), units[2]))
-        else
-            push!(new_units, reduce_units(units))
-        end
+    divisors = map(divisors) do (prefix, symbol, exponent)
+        (prefix, symbol, -exponent)
     end
 
-    return new_units
+    append!(factors, divisors)
+    return factors
 end
+
+
+function parse_factors(string)
+    factors = []
+    while (m = match(r"^" * r_unit_name, string)) !== nothing
+        unit_name = m.match
+        match(r"^" * r_divide, unit_name) !== nothing && break
+        string = consume(string, m)
+
+        if (m = match(r"^" * r_power * r_integer, string)) !== nothing
+            string = consume(string, m)
+            exponent = parse(Int, m.captures[1])
+        else
+            exponent = 1
+        end
+
+        push!(factors, (reduce_units(unit_name)..., exponent))
+
+        string = consume(string, match(r"^" * r_multiply, string))
+    end
+
+    return string, factors
+end
+
 
 """
     reduce_units(units_name::AstractString)
@@ -110,7 +119,7 @@ function reduce_units(units_name::AbstractString)
         end
     end
 
-    return units_prefix*core_units
+    return units_prefix, core_units
 end
 
 end # module

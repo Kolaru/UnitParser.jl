@@ -1,8 +1,7 @@
 name = "UnitParser"
 
 [deps]
-DrWatson = "634d3b9d-ee7a-5ddf-bec9-22491ea816e1"
-StringParserPEG = "b0c8ea40-1aeb-11ea-0927-b51424bf2dfe"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
 julia = "1.5.0"
