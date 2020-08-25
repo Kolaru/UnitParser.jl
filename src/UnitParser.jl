@@ -22,6 +22,8 @@ Remove the matching part of the RegexMatch and return the shorter string.
 consume(string, m::RegexMatch) = string[length(m.match)+1:end]
 consume(string, ::Nothing) = string
 
+match_start(pattern, string) = match(r"^" * pattern, string)
+
 
 """
     parse_units(string)
@@ -31,7 +33,7 @@ units represented as a tuple (prefix, name, exponent).
 """
 function parse_units(string)
     string, factors = parse_factors(string)
-    string = consume(string, match(r"^" * r_divide, string))
+    string = consume(string, match_start(r_divide, string))
     string, divisors = parse_factors(string)
 
     if length(string) > 0
@@ -49,12 +51,12 @@ end
 
 function parse_factors(string)
     factors = []
-    while (m = match(r"^" * r_unit_name, string)) !== nothing
+    while (m = match_start(r_unit_name, string)) !== nothing
         unit_name = m.match
-        match(r"^" * r_divide, unit_name) !== nothing && break
+        match_start(r_divide, unit_name) !== nothing && break
         string = consume(string, m)
 
-        if (m = match(r"^" * r_power * r_integer, string)) !== nothing
+        if (m = match_start(r_power * r_integer, string)) !== nothing
             string = consume(string, m)
             exponent = parse(Int, m.captures[1])
         else
@@ -63,7 +65,7 @@ function parse_factors(string)
 
         push!(factors, (reduce_units(unit_name)..., exponent))
 
-        string = consume(string, match(r"^" * r_multiply, string))
+        string = consume(string, match_start(r_multiply, string))
     end
 
     return string, factors
