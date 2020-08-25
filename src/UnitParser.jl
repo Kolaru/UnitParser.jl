@@ -9,7 +9,7 @@ const prefixes = aliases_data["prefixes"]
 const aliases = aliases_data["units"]
 
 const r_integer = r"(-?[0-9]+)"
-const r_unit_name = r"([A-Za-zμ]+)"
+const r_unit_name = r"([A-Za-zμΩ]+)"
 const r_power = r" *(?:\*\*|\^)? *"
 const r_divide = r" *(?:/|per|PER) *"
 const r_multiply = r" *[\*\. ] *"

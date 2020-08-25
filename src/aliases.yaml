@@ -40,3 +40,16 @@ units:
   kelvin: K
   radian: rad
   neper: Np
+
+  # Derived
+  joule: J
+  newton: N
+  watt: w
+  pascal: Pa
+  coulomb: C
+  volt: V
+  ohm: Ω
+  farad: F
+  henry: H
+  weber: Wb
+  tesla: T
