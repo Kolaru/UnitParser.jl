@@ -53,3 +53,7 @@ units:
   henry: H
   weber: Wb
   tesla: T
+  hour: hr
+  day: d
+  week: wk
+  steradian: sr
