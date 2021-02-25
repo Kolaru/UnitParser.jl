@@ -1,4 +1,7 @@
 name = "UnitParser"
+uuid = "4c23ceaa-6d37-4888-96ed-67eddcae2acd"
+authors = ["Benoît Richard <benoit.richard@desy.de>"]
+version = "0.1.0"
 
 [deps]
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
