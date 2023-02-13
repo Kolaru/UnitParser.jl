@@ -1,4 +1,7 @@
 name = "UnitParser"
+uuid = "4c23ceaa-6d37-4888-96ed-67eddcae2acd"
+authors = ["Benoît Richard <benoit.richard@desy.de>"]
+version = "0.1.0"
 
 [deps]
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"

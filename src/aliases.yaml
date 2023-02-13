@@ -1,5 +1,3 @@
-# Adapted from pint definitions https://github.com/hgrecco/pint
-# See pint license at https://github.com/hgrecco/pint/blob/master/LICENSE
 
 prefixes:
   yocto: y
@@ -25,6 +23,10 @@ prefixes:
   zetta: Z
   yotta: Y
 
+# Units directly defined by Unitful
+# See https://github.com/PainterQubits/Unitful.jl/blob/master/src/pkgdefaults.jl
+# The structur of these definitions closely follow those in unitful
+# pkgdeffaults.jl for easier maintenance
 units:
   # Base units
   meter: m
@@ -33,23 +35,123 @@ units:
   sec: s
   ampere: A
   amp: A
+  kelvin: K
   candela: cd
   candle: cd
   gram: g
   mole: mol
-  kelvin: K
-  radian: rad
-  neper: Np
 
-  # Derived
-  joule: J
+  # Angles and solid angles
+  steradian: sr
+  radian: rad
+  degree: °
+  deg: °
+
+  # SI and related units
+  hertz: Hz
   newton: N
-  watt: w
   pascal: Pa
+  joule: J
+  watt: w
   coulomb: C
   volt: V
   ohm: Ω
+  siemens: S
   farad: F
   henry: H
-  weber: Wb
   tesla: T
+  weber: Wb
+  lumen: lm
+  lux: lx
+  becquerel: Bq
+  gray: Gy
+  sievert: Sv
+  katal: kat
+  "%": percent
+  "‰": permille
+  "‱": pertenthousand
+
+  # Temperature
+  # No alias for °C
+  
+  # Common units of time
+  # No alias for minute, rps and rpm
+  hour: hr
+  day: d
+  week: wk
+  year: yr
+
+  # Area
+  are: a
+  hectare: ha
+  barn: b
+
+  # Volume
+  liter: L
+
+  # Molarity
+  molar: M
+
+  # Energy
+  electronvolt: eV
+
+  # For convenience
+  # No alias for bar and torr
+  anghertz: Hz2π
+  atmosphere: atm
+
+  # TODO add constants ?
+
+  # Acceleration
+  earthgravity: ge
+
+  # CGS units
+  # No alias for gal, erg and gauss
+  dyne: dyn
+  barye: Ba
+  poise: P
+  stokes: St
+  oersted: Oe
+  maxwell: Mx
+
+  # Shared Imperial / US customary units
+  # Length
+  # No alias for inch, mil and angstrom
+  foot: ft
+  feet: ft
+  yard: yd
+  mile: mi
+
+  # Area
+  acre: ac
+
+  # Temperature
+  # No alias for °F
+  rankine: Ra
+
+  # Masses
+  # No alias for slug
+  pound: lb
+  ounce: oz
+  dram: dr
+  grain: gr
+
+  # Force
+  poundsforce: lbf
+
+  # Energy
+  calorie: cal
+  britishthermalunit: btu
+
+  # Pressure
+  # No alias for psi
+
+  # Logarithmic scales and untis
+  decibel: dB
+  bel: B
+  neper: Np
+  centineper: cNp
+
+# TODO General definitions from pint
+# Adapted from pint definitions https://github.com/hgrecco/pint
+# See pint license at https://github.com/hgrecco/pint/blob/master/LICENSE
