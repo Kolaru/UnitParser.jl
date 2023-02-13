@@ -4,13 +4,14 @@ authors = ["Benoît Richard <benoit.richard@desy.de> and contributors"]
 version = "0.1.0"
 
 [deps]
+RelocatableFolders = "05181044-ff0b-4ac5-8273-598c1e38db00"
 Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
 
 [compat]
-julia = "1.6"
 Unitful = "1.12"
 YAML = "0.4"
+julia = "1.6"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"

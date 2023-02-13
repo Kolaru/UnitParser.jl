@@ -2,10 +2,15 @@ module UnitParser
 
 export parse_units, destructure_units, reduce_units_expr, short_form
 
+using RelocatableFolders
 using Unitful
 using YAML
 
-const aliases_data = YAML.load(open("src/aliases.yaml"))
+const ALIASES = @path joinpath(@__DIR__, "aliases.yaml")
+
+const aliases_data = open(ALIASES) do file
+    YAML.load(file)
+end
 const prefixes = aliases_data["prefixes"]
 const aliases = aliases_data["units"]
 
