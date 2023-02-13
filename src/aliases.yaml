@@ -25,7 +25,7 @@ prefixes:
 
 # Units directly defined by Unitful
 # See https://github.com/PainterQubits/Unitful.jl/blob/master/src/pkgdefaults.jl
-# The structur of these definitions closely follow those in unitful
+# The structure of these definitions closely follow those in unitful
 # pkgdeffaults.jl for easier maintenance
 units:
   # Base units
