@@ -1,33 +1,39 @@
 module UnitParser
 
-export destructure_units, reduce_units_expr
+export parse_units, destructure_units, reduce_units_expr, short_form
 
+using Unitful
 using YAML
 
 const aliases_data = YAML.load(open("src/aliases.yaml"))
 const prefixes = aliases_data["prefixes"]
 const aliases = aliases_data["units"]
 
-const r_integer = r"(-?[0-9]+)"
-const r_unit_name = r"([A-Za-zμΩ]+)"
-const r_power = r" *(?:\*\*|\^)? *"
-const r_divide = r" *(?:/|per|PER) *"
-const r_multiply = r" *[\*\. ] *"
+const r_integer = r"(-?[0-9]+)"  # Integers
+const r_unit_name = r"([A-Za-zμΩ]+)"  # Names of units including prefixes
+const r_power = r" *(?:\*\*|\^)? *"  # Power symbols
+const r_divide = r" *(?:/|per|PER) *"  # Division symbols
+const r_multiply = r" *[\*\. ] *"  # Multiplication symbols
 
 """
-    consume(string, m::RegexMatch)
+    consume(str, m::RegexMatch)
 
-Remove the matching part of the RegexMatch and return the shorter string.
+Remove the matching part of the RegexMatch and return the remaining string.
 """
-consume(string, m::RegexMatch) = string[length(m.match)+1:end]
-consume(string, ::Nothing) = string
+consume(str, m::RegexMatch) = str[length(m.match)+1:end]
+consume(str, ::Nothing) = str
 
-match_start(pattern, string) = match(r"^" * pattern, string)
+match_start(pattern, str) = match(r"^" * pattern, str)
 
 
-function reduce_units_expr(string::AbstractString)
-    factors = []
-    for (prefix, core, exponent) in destructure_units(string)
+function parse_units(str::AbstractString)
+    return uparse(reduce_units_expr(str))
+end
+
+
+function reduce_units_expr(str::AbstractString)
+    factors = String[]
+    for (prefix, core, exponent) in destructure_units(str)
         if exponent != 1
             factor = "$prefix$core^$exponent"
         else
@@ -40,18 +46,18 @@ end
 
 
 """
-    destructure_units(string)
+    destructure_units(str)
 
-Deconstruct a string representing units into a list of (prefix, name, exponent),
+Deconstruct a str representing units into a list of (prefix, name, exponent),
 one for each factor.
 """
-function destructure_units(string::AbstractString)
-    string, factors = destructure_factors(string)
-    string = consume(string, match_start(r_divide, string))
-    string, divisors = destructure_factors(string)
+function destructure_units(str::AbstractString)
+    str, factors = destructure_factors(str)
+    str = consume(str, match_start(r_divide, str))
+    str, divisors = destructure_factors(str)
 
-    if length(string) > 0
-        @error "The input string could not be fully parsed"
+    if length(str) > 0
+        @error "The input str could not be fully parsed"
     end
 
     divisors = map(divisors) do (prefix, symbol, exponent)
@@ -63,15 +69,15 @@ function destructure_units(string::AbstractString)
 end
 
 
-function destructure_factors(string::AbstractString)
+function destructure_factors(str::AbstractString)
     factors = []
-    while (match_start(r_divide, string) === nothing &&
-          (m = match_start(r_unit_name, string)) !== nothing)
+    while (match_start(r_divide, str) === nothing &&
+          (m = match_start(r_unit_name, str)) !== nothing)
         unit_name = m.match
-        string = consume(string, m)
+        str = consume(str, m)
 
-        if (m = match_start(r_power * r_integer, string)) !== nothing
-            string = consume(string, m)
+        if (m = match_start(r_power * r_integer, str)) !== nothing
+            str = consume(str, m)
             exponent = parse(Int, m.captures[1])
         else
             exponent = 1
@@ -79,19 +85,19 @@ function destructure_factors(string::AbstractString)
 
         push!(factors, (short_form(unit_name)..., exponent))
 
-        string = consume(string, match_start(r_multiply, string))
+        str = consume(str, match_start(r_multiply, str))
     end
 
-    return string, factors
+    return str, factors
 end
 
 
 """
-    short_form(units_name::AstractString)
+    short_form(unit_name::AstractString)
 
 Reduce the natural name of a units to its symbolic form for prefix and name.
 
-If no match is found, return the original string.
+If no match is found, return the original str.
 
 Example
 =======
@@ -102,34 +108,34 @@ Return
 ======
 unit_prefix: String
     Short form representing the prefix of the units, e.g. "k" for "kilo".
-    Set to empty string if the units had no prefix.
+    Set to empty str if the units had no prefix.
 
 core_unit: String
     Short form representing the units, e.g. "A" for "ampere".
 """
-function short_form(units_name::AbstractString)
-    units_name = lowercase(units_name)
+function short_form(unit_name::AbstractString)
+    unit_name = lowercase(unit_name)
 
     # Remove trailing 's' to account for pluralized units
-    if units_name[end] == 's'
-        units_name = units_name[1:end-1]
+    if unit_name[end] == 's'
+        unit_name = unit_name[1:end-1]
     end
 
     unit_prefix = ""
 
     for (prefix, symbol) in prefixes
         n = length(prefix)
-        if length(units_name) >= n && units_name[1:n] == prefix
+        if length(unit_name) >= n && unit_name[1:n] == prefix
             unit_prefix = symbol
-            units_name = units_name[n+1:end]
+            unit_name = unit_name[n+1:end]
             break
         end
     end
 
-    core_unit = units_name
+    core_unit = unit_name
 
     for (alias, symbol) in aliases
-        if units_name == alias
+        if unit_name == alias
             core_unit = symbol
             break
         end

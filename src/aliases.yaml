@@ -2,28 +2,28 @@
 # See pint license at https://github.com/hgrecco/pint/blob/master/LICENSE
 
 prefixes:
-    yocto: y
-    zepto: z
-    atto: a
-    femto: f
-    pico: p
-    nano: n
-    micro: μ
-    u: μ
-    milli: m
-    centi: c
-    deci: d
-    deca: da
-    deka: da
-    hecto: h
-    kilo: k
-    mega: M
-    giga: G
-    tera: T
-    peta: P
-    exa: E
-    zetta: Z
-    yotta: Y
+  yocto: y
+  zepto: z
+  atto: a
+  femto: f
+  pico: p
+  nano: n
+  micro: μ
+  u: μ
+  milli: m
+  centi: c
+  deci: d
+  deca: da
+  deka: da
+  hecto: h
+  kilo: k
+  mega: M
+  giga: G
+  tera: T
+  peta: P
+  exa: E
+  zetta: Z
+  yotta: Y
 
 units:
   # Base units
