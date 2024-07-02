@@ -121,6 +121,9 @@ core_unit: String
 function short_form(unit_name::AbstractString)
     unit_name = lowercase(unit_name)
 
+    length(unit_name) == 1 && return ("", unit_name)
+    length(unit_name) == 2 && return (string(unit_name[1]), string(unit_name[2]))
+
     # Remove trailing 's' to account for pluralized units
     if unit_name[end] == 's'
         unit_name = unit_name[1:end-1]
