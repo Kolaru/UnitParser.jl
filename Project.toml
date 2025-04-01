@@ -1,7 +1,7 @@
 name = "UnitParser"
 uuid = "4f5ed358-3ce2-420f-a24d-a4403009d11e"
 authors = ["Benoît Richard <benoit.richard@desy.de> and contributors"]
-version = "0.1.1"
+version = "0.1.2"
 
 [deps]
 RelocatableFolders = "05181044-ff0b-4ac5-8273-598c1e38db00"

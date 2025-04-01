@@ -1,4 +1,5 @@
 using UnitParser
+using Unitful
 using Test
 
 @testset "UnitParser.jl" begin
@@ -13,7 +14,16 @@ using Test
     @testset "Seconds" begin
         @test short_form("ms") == ("m", "s")
         @test reduce_units_expr("ms") == "ms"
+        @test parse_units("ms") == u"ms"
         @test short_form("s") == ("", "s")
         @test reduce_units_expr("m s") == "m*s"
+        @test parse_units("m s") == u"m*s"
+    end
+
+    @testset "Micrometer (unicode)" begin
+        @test short_form("μm") == ("μ", "m")
+        @test reduce_units_expr("μm") == "μm"
+        @test parse_units("μm") == u"μm" 
+        @test parse_units("micrometers") == u"μm"
     end
 end

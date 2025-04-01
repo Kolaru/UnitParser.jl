@@ -25,7 +25,7 @@ const r_multiply = r" *[\*\. ] *"  # Multiplication symbols
 
 Remove the matching part of the RegexMatch and return the remaining string.
 """
-consume(str, m::RegexMatch) = str[length(m.match)+1:end]
+consume(str, m::RegexMatch) = str[sizeof(m.match)+1:end]
 consume(str, ::Nothing) = str
 
 match_start(pattern, str) = match(r"^" * pattern, str)
@@ -122,7 +122,7 @@ function short_form(unit_name::AbstractString)
     unit_name = lowercase(unit_name)
 
     length(unit_name) == 1 && return ("", unit_name)
-    length(unit_name) == 2 && return (string(unit_name[1]), string(unit_name[2]))
+    length(unit_name) == 2 && return (string(first(unit_name)), string(unit_name[nextind(unit_name, 1)]))
 
     # Remove trailing 's' to account for pluralized units
     if unit_name[end] == 's'
