@@ -31,8 +31,8 @@ consume(str, ::Nothing) = str
 match_start(pattern, str) = match(r"^" * pattern, str)
 
 
-function parse_units(str::AbstractString)
-    return uparse(reduce_units_expr(str))
+function parse_units(str::AbstractString ; unit_context = Unitful)
+    return uparse(reduce_units_expr(str) ; unit_context)
 end
 
 
