@@ -62,7 +62,7 @@ function destructure_units(str::AbstractString)
     str, divisors = destructure_factors(str)
 
     if length(str) > 0
-        @error "The input str could not be fully parsed"
+        throw(ArgumentError("The input str $str could not be fully parsed"))
     end
 
     divisors = map(divisors) do (prefix, symbol, exponent)
