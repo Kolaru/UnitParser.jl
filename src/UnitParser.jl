@@ -4,6 +4,7 @@ export parse_units, destructure_units, reduce_units_expr, short_form
 
 using RelocatableFolders
 using Unitful
+using UnitfulAtomic
 using YAML
 
 const ALIASES = @path joinpath(@__DIR__, "aliases.yaml")
@@ -15,7 +16,7 @@ const prefixes = aliases_data["prefixes"]
 const aliases = aliases_data["units"]
 
 const r_integer = r"(-?[0-9]+)"  # Integers
-const r_unit_name = r"([A-Za-zμΩ]+)"  # Names of units including prefixes
+const r_unit_name = r"([A-Za-zμΩħ]+)"  # Names of units including prefixes
 const r_power = r" *(?:\*\*|\^)? *"  # Power symbols
 const r_divide = r" *(?:/|per|PER) *"  # Division symbols
 const r_multiply = r" *[\*\. ] *"  # Multiplication symbols
@@ -31,7 +32,7 @@ consume(str, ::Nothing) = str
 match_start(pattern, str) = match(r"^" * pattern, str)
 
 
-function parse_units(str::AbstractString ; unit_context = Unitful)
+function parse_units(str::AbstractString ; unit_context = [Unitful, UnitfulAtomic])
     return uparse(reduce_units_expr(str) ; unit_context)
 end
 
@@ -121,7 +122,10 @@ core_unit: String
 function short_form(unit_name::AbstractString)
     unit_name = lowercase(unit_name)
 
-    length(unit_name) == 1 && return ("", unit_name)
+    if length(unit_name) == 1
+        unit_name == "e" && return ("", "e_au")  # Special case for the electron charge
+        return ("", unit_name)
+    end
     length(unit_name) == 2 && return (string(first(unit_name)), string(unit_name[nextind(unit_name, 1)]))
 
     # Remove trailing 's' to account for pluralized units

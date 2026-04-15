@@ -1,5 +1,6 @@
 using UnitParser
 using Unitful
+using UnitfulAtomic
 using Test
 
 @testset "UnitParser.jl" begin
@@ -25,5 +26,10 @@ using Test
         @test reduce_units_expr("μm") == "μm"
         @test parse_units("μm") == u"μm" 
         @test parse_units("micrometers") == u"μm"
+    end
+
+    @testset "UnitfulAtomic" begin
+        @test parse_units("e") == u"e_au"
+        @test parse_units("ħ / bohr") == 1.0aunit(u"kg * m / s")  # Atomic unit of momentum
     end
 end
