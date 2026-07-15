@@ -32,4 +32,8 @@ using Test
         @test parse_units("e") == u"e_au"
         @test parse_units("ħ / bohr") == 1.0aunit(u"kg * m / s")  # Atomic unit of momentum
     end
+
+    @testset "NoUnits" begin
+        @test parse_units("") == NoUnits
+    end
 end

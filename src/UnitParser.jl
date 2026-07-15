@@ -33,6 +33,7 @@ match_start(pattern, str) = match(r"^" * pattern, str)
 
 
 function parse_units(str::AbstractString ; unit_context = [Unitful, UnitfulAtomic])
+    isempty(str) && return NoUnits
     return uparse(reduce_units_expr(str) ; unit_context)
 end
 
